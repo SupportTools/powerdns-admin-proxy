@@ -47,6 +47,7 @@ jobs:
         with:
           repository: SupportTools/helm-chart
           path: ./helm-chart-repo
+          token: ${{ secrets.HELM_CHART_PAT }}
     
       - name: Add Helm Chart
         run: cp ./charts/*.tgz ./helm-chart-repo/
