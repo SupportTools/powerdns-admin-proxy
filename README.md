@@ -22,12 +22,12 @@ This application serves as a reverse proxy for the PowerDNS Admin service. It fo
     ```
 
 3. Edit Helm values
-   
+
    ```bash
    vi ./charts/powerdns-admin-proxy/values.yaml
    ```
-
-NOTE: You will need to change the `backendUrl` to the URL of your PowerDNS Admin service and the ingress host to the hostname of your PowerDNS Admin service.
+   
+   NOTE: You will need to change the `backendUrl` to the URL of your PowerDNS Admin service and the ingress host to the hostname of your PowerDNS Admin service.
 
 4. Install Helm chart:
 

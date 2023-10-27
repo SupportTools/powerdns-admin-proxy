@@ -1,0 +1,64 @@
+name: Build, Test, and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-test-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v4.1.0
+        with:
+          go-version: '>=1.21.0'
+
+      - name: Build and test Go code
+        run: |
+          go build ./...
+          go test ./...
+
+      - name:  Build, tag, and push the image to Docker Hub
+        run: |
+          echo "Logging in to Docker Hub..."
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          echo "Building the Docker image..."
+          docker build --pull --build-arg GIT_COMMIT=$(git rev-parse HEAD) -t supporttools/powerdns-admin-proxy:${{ github.sha }} .
+          echo "Pushing the Docker image..."
+          docker push supporttools/powerdns-admin-proxy:${{ github.sha }}
+      
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v1
+    
+      - name: Lint Helm Chart
+        run: helm lint ./path/to/chart
+    
+      - name: Package Helm Chart
+        run: helm package ./path/to/chart -d ./charts
+    
+      - name: Checkout Helm Chart Repo
+        uses: actions/checkout@v2
+        with:
+          repository: SupportTools/helm-chart
+          path: ./helm-chart-repo
+    
+      - name: Add Helm Chart
+        run: cp ./charts/*.tgz ./helm-chart-repo/
+    
+      - name: Update Helm Repo Index
+        run: cd ./helm-chart-repo && helm repo index ./
+    
+      - name: Commit and Push
+        run: |
+          cd ./helm-chart-repo
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add -A
+          git commit -m "Add new chart version"
+          git push
