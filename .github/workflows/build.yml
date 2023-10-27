@@ -40,7 +40,7 @@ jobs:
         run: helm lint ./charts/powerdns-admin-proxy/
     
       - name: Package Helm Chart
-        run: helm package ./charts/powerdns-admin-proxy/ -d ./charts --app-version ${{ github.run_number }}
+        run: helm package ./charts/powerdns-admin-proxy/ -d ./charts --app-version ${{ github.run_number }} --version 0.1.${{ github.run_number }}
     
       - name: Checkout Helm Chart Repo
         uses: actions/checkout@v2
