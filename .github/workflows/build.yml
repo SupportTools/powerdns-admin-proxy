@@ -42,12 +42,21 @@ jobs:
       - name: Package Helm Chart
         run: helm package ./charts/powerdns-admin-proxy/ -d ./charts --app-version ${{ github.run_number }} --version 0.1.${{ github.run_number }}
     
+      - name: Mint helm-chart repo token (GitHub App supporttools-chart-publisher)
+        id: chart-app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.CHART_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CHART_APP_PRIVATE_KEY }}
+          owner: SupportTools
+          repositories: helm-chart,helm-chart-private
+
       - name: Checkout Helm Chart Repo
         uses: actions/checkout@v2
         with:
           repository: SupportTools/helm-chart
           path: ./helm-chart-repo
-          token: ${{ secrets.HELM_CHART_PAT }}
+          token: ${{ steps.chart-app-token.outputs.token }}
     
       - name: Add Helm Chart
         run: cp ./charts/*.tgz ./helm-chart-repo/
